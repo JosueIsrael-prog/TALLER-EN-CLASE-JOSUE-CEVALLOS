@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -20,12 +20,14 @@ namespace Taller_en_Clase.Controllers
         }
 
         // GET: Estadios
+        // Método para mostrar todos los estadios
         public async Task<IActionResult> Index()
         {
             return View(await _context.Estadio.ToListAsync());
         }
 
         // GET: Estadios/Details/5
+        // Método para mostrar los detalles de un estadio específico
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -44,14 +46,14 @@ namespace Taller_en_Clase.Controllers
         }
 
         // GET: Estadios/Create
+        // Método para mostrar el formulario de creación de un nuevo estadio
         public IActionResult Create()
         {
             return View();
         }
 
         // POST: Estadios/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        // Método para crear un nuevo estadio
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Direccion,Ciudad,Capacidad")] Estadio estadio)
@@ -66,6 +68,7 @@ namespace Taller_en_Clase.Controllers
         }
 
         // GET: Estadios/Edit/5
+        // Método para mostrar el formulario de edición de un estadio existente
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -82,8 +85,7 @@ namespace Taller_en_Clase.Controllers
         }
 
         // POST: Estadios/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        // Método para guardar los cambios realizados en un estadio existente
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Direccion,Ciudad,Capacidad")] Estadio estadio)
@@ -117,6 +119,7 @@ namespace Taller_en_Clase.Controllers
         }
 
         // GET: Estadios/Delete/5
+        // Método para mostrar la vista de confirmación de eliminación de un estadio
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -135,20 +138,29 @@ namespace Taller_en_Clase.Controllers
         }
 
         // POST: Estadios/Delete/5
+        // Método para confirmar la eliminación de un estadio
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var estadio = await _context.Estadio.FindAsync(id);
-            if (estadio != null)
+            try
             {
-                _context.Estadio.Remove(estadio);
+                var estadio = await _context.Estadio.FindAsync(id);
+                if (estadio != null)
+                {
+                    _context.Estadio.Remove(estadio);
+                    await _context.SaveChangesAsync();
+                }
             }
-
-            await _context.SaveChangesAsync();
+            catch (Exception ex)
+            {
+                // Manejo de error en caso de que ocurra una excepción al eliminar el estadio
+                ModelState.AddModelError("", "No se pudo eliminar el estadio.");
+            }
             return RedirectToAction(nameof(Index));
         }
 
+        // Método privado para verificar si un estadio existe en la base de datos
         private bool EstadioExists(int id)
         {
             return _context.Estadio.Any(e => e.Id == id);
