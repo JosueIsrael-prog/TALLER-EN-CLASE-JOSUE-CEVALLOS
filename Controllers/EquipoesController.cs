@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -20,12 +20,14 @@ namespace Taller_en_Clase.Controllers
         }
 
         // GET: Equipoes
+        // Método para mostrar todos los equipos
         public async Task<IActionResult> Index()
         {
             return View(await _context.Equipo.ToListAsync());
         }
 
         // GET: Equipoes/Details/5
+        // Método para mostrar los detalles de un equipo específico
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -44,14 +46,14 @@ namespace Taller_en_Clase.Controllers
         }
 
         // GET: Equipoes/Create
+        // Método para mostrar el formulario de creación de un nuevo equipo
         public IActionResult Create()
         {
             return View();
         }
 
         // POST: Equipoes/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        // Método para crear un nuevo equipo
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Nombre,Ciudad,Titulos,AceptaExtranjeros")] Equipo equipo)
@@ -66,6 +68,7 @@ namespace Taller_en_Clase.Controllers
         }
 
         // GET: Equipoes/Edit/5
+        // Método para mostrar el formulario de edición de un equipo existente
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -82,8 +85,7 @@ namespace Taller_en_Clase.Controllers
         }
 
         // POST: Equipoes/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        // Método para guardar los cambios realizados en un equipo existente
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Nombre,Ciudad,Titulos,AceptaExtranjeros")] Equipo equipo)
@@ -117,6 +119,7 @@ namespace Taller_en_Clase.Controllers
         }
 
         // GET: Equipoes/Delete/5
+        // Método para mostrar la vista de confirmación de eliminación de un equipo
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -135,20 +138,29 @@ namespace Taller_en_Clase.Controllers
         }
 
         // POST: Equipoes/Delete/5
+        // Método para confirmar la eliminación de un equipo
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var equipo = await _context.Equipo.FindAsync(id);
-            if (equipo != null)
+            try
             {
-                _context.Equipo.Remove(equipo);
+                var equipo = await _context.Equipo.FindAsync(id);
+                if (equipo != null)
+                {
+                    _context.Equipo.Remove(equipo);
+                    await _context.SaveChangesAsync();
+                }
             }
-
-            await _context.SaveChangesAsync();
+            catch (Exception ex)
+            {
+                // Manejo de error en caso de que ocurra una excepción al eliminar el equipo
+                ModelState.AddModelError("", "No se pudo eliminar el equipo.");
+            }
             return RedirectToAction(nameof(Index));
         }
 
+        // Método privado para verificar si un equipo existe en la base de datos
         private bool EquipoExists(int id)
         {
             return _context.Equipo.Any(e => e.Id == id);
