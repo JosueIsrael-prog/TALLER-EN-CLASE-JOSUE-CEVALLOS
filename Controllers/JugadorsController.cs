@@ -20,6 +20,7 @@ namespace Taller_en_Clase.Controllers
         }
 
         // GET: Jugadors
+        // Método para mostrar la lista de todos los jugadores
         public async Task<IActionResult> Index()
         {
             var taller_en_ClaseContext = _context.Jugador.Include(j => j.Equipo);
@@ -27,6 +28,7 @@ namespace Taller_en_Clase.Controllers
         }
 
         // GET: Jugadors/Details/5
+        // Método para mostrar los detalles de un jugador específico
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -46,6 +48,7 @@ namespace Taller_en_Clase.Controllers
         }
 
         // GET: Jugadors/Create
+        // Método para mostrar el formulario de creación de un nuevo jugador
         public IActionResult Create()
         {
             ViewData["IdEquipo"] = new SelectList(_context.Equipo, "Id", "Nombre");
@@ -53,8 +56,7 @@ namespace Taller_en_Clase.Controllers
         }
 
         // POST: Jugadors/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        // Método para crear un nuevo jugador
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Nombre,posicion,edad,IdEquipo")] Jugador jugador)
@@ -70,6 +72,7 @@ namespace Taller_en_Clase.Controllers
         }
 
         // GET: Jugadors/Edit/5
+        // Método para mostrar el formulario de edición de un jugador existente
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -87,8 +90,7 @@ namespace Taller_en_Clase.Controllers
         }
 
         // POST: Jugadors/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        // Método para guardar los cambios en un jugador existente
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Nombre,posicion,edad,IdEquipo")] Jugador jugador)
@@ -123,6 +125,7 @@ namespace Taller_en_Clase.Controllers
         }
 
         // GET: Jugadors/Delete/5
+        // Método para mostrar la confirmación de eliminación de un jugador
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -142,20 +145,29 @@ namespace Taller_en_Clase.Controllers
         }
 
         // POST: Jugadors/Delete/5
+        // Método para confirmar la eliminación de un jugador
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var jugador = await _context.Jugador.FindAsync(id);
-            if (jugador != null)
+            try
             {
-                _context.Jugador.Remove(jugador);
+                var jugador = await _context.Jugador.FindAsync(id);
+                if (jugador != null)
+                {
+                    _context.Jugador.Remove(jugador);
+                    await _context.SaveChangesAsync();
+                }
             }
-
-            await _context.SaveChangesAsync();
+            catch (Exception ex)
+            {
+                // Manejo de error en caso de que ocurra una excepción al eliminar el jugador
+                ModelState.AddModelError("", "No se pudo eliminar el jugador.");
+            }
             return RedirectToAction(nameof(Index));
         }
 
+        // Método privado para verificar si un jugador existe en la base de datos
         private bool JugadorExists(int id)
         {
             return _context.Jugador.Any(e => e.Id == id);
